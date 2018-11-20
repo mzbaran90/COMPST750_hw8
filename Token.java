@@ -23,7 +23,7 @@ public class Token {
 	 * @param doc
 	 * @return list of integers or null
 	 */
-	public List<Integer> getPositions(Document doc, String docContents){
+	public List<Integer> getPositions(Document doc){
 		
 		List<Integer> tokeyPositions = new ArrayList<>();
 		String tokey = this.token;
@@ -38,6 +38,7 @@ public class Token {
 			position = docContents.indexOf(tokey, index);
 			index += index + tokeyLength;
 			tokeyPositions.add(position);
+			
 			this.setPositions(doc, position);
 			
 		    
