@@ -1,9 +1,11 @@
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 
 public class Indexer {
 
@@ -22,15 +24,21 @@ public class Indexer {
 	 */
 	Map <Token, List<Document>> reversedIndex;
 	Map <String, Token> allTokens;
-	static Map <String,Document> allDocs;
-	List<String> allDocsSorted;
-	int assignID= 0;
+	Map <String,Document> allDocs;
+	List<Document> allDocsSorted;
+	int assignID;
 
 	public Indexer() {
 		//TODO
 		//Declare all instance variables
 		//What should each variable be initialized to?
-		this.assignID += 1;
+		reversedIndex = new HashMap<>();
+		allDocs = new HashMap <>();
+		allDocsSorted = new ArrayList<>();
+		allTokens = new HashMap <>();
+	
+		
+		this.assignID = 1;
 	}
 	
 	
@@ -55,15 +63,19 @@ public class Indexer {
 		String name = getName(docString);
 
 		Document createDoc = new Document(this.assignID,name);
+		assignID++;
 		
-		if(allDocs.containsValue(createDoc) && name == null) {
+		if(allDocs.containsKey(docString) || name == null) {
+			
 			return;
 
 		}
 
 		allDocs.put(docString, createDoc);
+		
+		allDocsSorted.add(createDoc);
 
-		String docContents = docString.substring(name.length() +1);
+		String docContents = docString.substring(name.length());
 
 		List<String> seperateTokens = new ArrayList<String>(Arrays.asList(docContents.split(" ")));
 
@@ -215,6 +227,12 @@ public class Indexer {
 	public void printOutAllDocs() {
 		
 		//TODO - printOutAllDocs
+		
+		for(Document doc: this.allDocsSorted) {
+			System.out.println("DocID: " + doc.getID() + " DocName: " + doc.getName());
+			System.out.println();
+			
+		}
 	
 	}
 	

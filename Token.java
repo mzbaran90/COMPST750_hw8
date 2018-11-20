@@ -1,11 +1,12 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class Token {
 	
 	String token;
-	Map <Document, List<Integer>> positionalIndex;
+	Map <Document, List<Integer>> positionalIndex = new HashMap<>();
 	
 	public Token(String str) {
 		//TODO
