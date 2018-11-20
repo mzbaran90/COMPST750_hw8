@@ -23,15 +23,18 @@ public class Token {
 	 * @return list of integers or null
 	 */
 	public List<Integer> getPositions(Document doc){
-		List<Integer>listOfPos = null;
+		List <Integer>listOfPos = new ArrayList<>();;
 		
 		if(positionalIndex.containsKey(doc)) {
-			System.out.println("test");
-			listOfPos = new ArrayList<>();
+			
+			
 			listOfPos = positionalIndex.get(doc);
+		
+			return listOfPos;
+			
 		}
 		
-		return listOfPos;
+		return null;
 		
 	}
 
@@ -49,13 +52,16 @@ public class Token {
 		
 		//TODO - setPostions
 		List<Integer>listOfPos = new ArrayList <>();
-		if(positionalIndex.containsKey(doc) && p >= 0) {
-			listOfPos = positionalIndex.get(doc);
-			listOfPos.add(p);
-			System.out.print("test");
+		if(positionalIndex.containsKey(doc) && p != -1) {
 			
+			listOfPos = positionalIndex.get(doc);
+			if(!listOfPos.contains(p)) {
+				listOfPos.add(p);
+			}
+			
+			positionalIndex.put(doc, listOfPos);
 		}
-		else if((!positionalIndex.containsKey(doc) && p >= 0)) {
+		else if((!positionalIndex.containsKey(doc)) && p != -1) {
 			listOfPos.add(p);
 			positionalIndex.put(doc, listOfPos);
 		

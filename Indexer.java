@@ -64,13 +64,15 @@ public class Indexer {
 		
 
 		Document createDoc = new Document(this.assignID,name);
-		assignID++;
+		
 
 		if(allDocs.containsKey(docString)) {
 
 			return;
 
 		}
+		
+		assignID++;
 
 		allDocs.put(docString, createDoc);
  
@@ -85,14 +87,22 @@ public class Indexer {
 			int index = 0;
 			
 			String formattedString = removePunctuation(token);
-			System.out.println(token);
+			
 
 			Token createToken = checkToken(formattedString);
+			
 			List<Document> mapToDoc = checkToken_Document(createToken, createDoc);
-
+			
+			//if(!mapToDoc.contains(createToken)) {
+				
 			reversedIndex.put(createToken, mapToDoc);
+				
+			
+			
+			
+			
 			while(positionIndex!= -1) {
-				positionIndex = docString.indexOf(token, index);
+				positionIndex = docString.toLowerCase().indexOf(formattedString, index);
 				createToken.setPositions(createDoc, positionIndex);
 			
 				index = positionIndex + token.length();
@@ -154,8 +164,10 @@ public class Indexer {
 		
 		Token temp = new Token(str);
 		if(allTokens.containsKey(str)) {
-			temp = null;
+			temp = allTokens.get(str);
+			return temp;
 		}
+		allTokens.put(str, temp);
 		return temp;
 		
 	}
@@ -180,13 +192,14 @@ public class Indexer {
 		for(Token tokey: reversedIndex.keySet()) {
 
 			if(tokey.equals(token)) {
-
-				if(!reversedIndex.get(tokey).contains(doc)) {
+				addDoc = reversedIndex.get(tokey);
+				
+				if(!addDoc.contains(doc)) {
 					addDoc.add(doc);
 					return addDoc;
 
 				}
-				else if (reversedIndex.get(token).contains(doc)){
+				else if (addDoc.contains(doc)){
 					return addDoc;
 				}
 				
@@ -213,48 +226,53 @@ public class Indexer {
 	public void singleQuery(String query) {
 		
 		//TODO - singleQuery
-		
-		
+
+
 		Token tokeHold = null;
-		
+
 		List<Document> listOfDocs = new ArrayList<>();
-		
+
 		for(Token tokey: reversedIndex.keySet()) {
-			if(tokey.toString().equals(query)) {
+			if(tokey.toString().equals(query.toLowerCase())) {
 				tokeHold = tokey;
-				
+
 				break;
 			}
-			
-		}
-		
-		listOfDocs = reversedIndex.get(tokeHold);
-		
-		
-		
-		
-		System.out.println(query);
-		
-		System.out.println("\tDocument name(s)");
-		
-		for(Document doc: listOfDocs) {
-			System.out.println(doc.getName());
-		
-		}
-		for(Document doc: listOfDocs) {
-			System.out.println(doc.getName());
-			for(Integer position: tokeHold.getPositions(doc)) {
-				System.out.println(position);
-				
-			}
-		}
-		
 
-		
-	
-	
+		}
+
+		listOfDocs = reversedIndex.get(tokeHold);
+
+
+
+
+
+
+		System.out.println("\tDocument name(s)");
+
+		for(Document doc: listOfDocs) {
+			System.out.println(doc.getName());
+			System.out.println();
+
+		}
+		for(Document doc: listOfDocs) {
+			System.out.println(doc.getName());
+			List<Integer>listOfPos = tokeHold.getPositions(doc);
+			if(listOfPos != null) {
+				for(Integer position: listOfPos) {
+					System.out.println(position);
+
+				}
+			}
+
+		}
+
+
+
+
+
 	}
-	
+
 	/**
 	 * Graduate students must complete.
 	 * Undergraduates may feel free to attempt this if they wish.
