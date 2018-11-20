@@ -53,13 +53,15 @@ public class Indexer {
 	 */
 	public void indexDocument(String docString) {
 		String name = getName(docString);
-		if(allDocs.containsKey(name) && name == null) {
+
+		Document createDoc = new Document(this.assignID,name);
+		
+		if(allDocs.containsValue(createDoc) && name == null) {
 			return;
 
 		}
-		Document createDoc = new Document(this.assignID,name);
 
-		allDocs.put(name, createDoc);
+		allDocs.put(docString, createDoc);
 
 		String docContents = docString.substring(name.length() +1);
 
@@ -75,6 +77,9 @@ public class Indexer {
 				List<Document> mapToDoc = checkToken_Document(createToken, createDoc);
 				
 				reversedIndex.put(createToken, mapToDoc);
+				
+				createToken.getPositions(createDoc, docContents);
+				
 				
 
 

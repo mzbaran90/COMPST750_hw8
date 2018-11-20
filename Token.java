@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -21,18 +22,27 @@ public class Token {
 	 * @param doc
 	 * @return list of integers or null
 	 */
-	public List<Integer> getPositions(Document doc){
+	public List<Integer> getPositions(Document doc, String docContents){
 		
-		List<Integer> tokeyPositions;
+		List<Integer> tokeyPositions = new ArrayList<>();
 		String tokey = this.token;
 		int tokeyLength = tokey.length();
 		int index = 0;
+		int position = 0;
 		
-		while (index != -1) {  // indexOf returns -1 if no match found
-		    String contents = Indexer.allDocs.
-		    //index = text.indexOf(match, index + matchLength);
-		}
 		
+	
+		while (position != -1) { 
+		    
+			position = docContents.indexOf(tokey, index);
+			index += index + tokeyLength;
+			tokeyPositions.add(position);
+			this.setPositions(doc, position);
+			
+		    
+		
+		}	
+		return tokeyPositions;
 	}
 
 	/**
@@ -48,6 +58,13 @@ public class Token {
 	public void setPositions(Document doc, Integer p) {
 		
 		//TODO - setPostions
+		List<Integer>listOfPos = new ArrayList <>();
+		if(positionalIndex.containsKey(doc)) {
+			listOfPos = positionalIndex.get(doc);
+			listOfPos.add(p);
+		}
+		listOfPos.add(p);
+		positionalIndex.put(doc, listOfPos);
 
 	}
 
@@ -56,6 +73,8 @@ public class Token {
 		
 		//TODO - toString
 		//toString only returns the String instance variable.
+		
+		return this.token;
 		
 	}
 	
