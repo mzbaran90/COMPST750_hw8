@@ -5,15 +5,14 @@ import java.util.Map;
 
 public class Token {
 	
-	String token;
-	Map <Document, List<Integer>> positionalIndex = new HashMap<>();
+	private String token;
+	private Map <Document, List<Integer>> positionalIndex = new HashMap<>();
 	
 	public Token(String str) {
 		//TODO
 		this.token = str;
 		
-	
-		
+
 	}
 	
 	/**
@@ -24,27 +23,16 @@ public class Token {
 	 * @return list of integers or null
 	 */
 	public List<Integer> getPositions(Document doc){
+		List<Integer>listOfPos = null;
 		
-		List<Integer> tokeyPositions = new ArrayList<>();
-		String tokey = this.token;
-		int tokeyLength = tokey.length();
-		int index = 0;
-		int position = 0;
+		if(positionalIndex.containsKey(doc)) {
+			System.out.println("test");
+			listOfPos = new ArrayList<>();
+			listOfPos = positionalIndex.get(doc);
+		}
 		
+		return listOfPos;
 		
-	
-		while (position != -1) { 
-		    
-			position = docContents.indexOf(tokey, index);
-			index += index + tokeyLength;
-			tokeyPositions.add(position);
-			
-			this.setPositions(doc, position);
-			
-		    
-		
-		}	
-		return tokeyPositions;
 	}
 
 	/**
@@ -61,12 +49,17 @@ public class Token {
 		
 		//TODO - setPostions
 		List<Integer>listOfPos = new ArrayList <>();
-		if(positionalIndex.containsKey(doc)) {
+		if(positionalIndex.containsKey(doc) && p >= 0) {
 			listOfPos = positionalIndex.get(doc);
 			listOfPos.add(p);
+			System.out.print("test");
+			
 		}
-		listOfPos.add(p);
-		positionalIndex.put(doc, listOfPos);
+		else if((!positionalIndex.containsKey(doc) && p >= 0)) {
+			listOfPos.add(p);
+			positionalIndex.put(doc, listOfPos);
+		
+		}
 
 	}
 

@@ -61,13 +61,12 @@ public class Indexer {
 	 */
 	public void indexDocument(String docString) {
 		String name = getName(docString);
-		int positionIndex = 0;
-		int index = 0;
+		
 
 		Document createDoc = new Document(this.assignID,name);
 		assignID++;
 
-		if(allDocs.containsKey(docString) || name == null) {
+		if(allDocs.containsKey(docString)) {
 
 			return;
 
@@ -81,29 +80,26 @@ public class Indexer {
 
 		List<String> seperateTokens = new ArrayList<String>(Arrays.asList(docContents.split(" ")));
 
-		for (String token: seperateTokens) {
+		for(String token: seperateTokens) {
+			int positionIndex = 0;
+			int index = 0;
+			
 			String formattedString = removePunctuation(token);
+			System.out.println(token);
 
 			Token createToken = checkToken(formattedString);
+			List<Document> mapToDoc = checkToken_Document(createToken, createDoc);
 
-			if(createToken != null) {
-
-				List<Document> mapToDoc = checkToken_Document(createToken, createDoc);
-
-				reversedIndex.put(createToken, mapToDoc);
-				
-				positionIndex = token.indexOf(docString, index);
-				
+			reversedIndex.put(createToken, mapToDoc);
+			while(positionIndex!= -1) {
+				positionIndex = docString.indexOf(token, index);
 				createToken.setPositions(createDoc, positionIndex);
-				
-				index+= token.length();
+			
+				index = positionIndex + token.length();
+			
+		}
+		
 
-				
-
-
-
-
-			}
 		}
 	}
 
@@ -157,7 +153,7 @@ public class Indexer {
 	protected Token checkToken(String str) {
 		
 		Token temp = new Token(str);
-		if(allTokens.containsValue(temp)) {
+		if(allTokens.containsKey(str)) {
 			temp = null;
 		}
 		return temp;
@@ -181,11 +177,21 @@ public class Indexer {
 
 		List<Document> addDoc = new ArrayList<>();
 
-		if(reversedIndex.containsKey(token)) {
-			if(reversedIndex.get(token).contains(doc)) {
-				addDoc = reversedIndex.get(token);
-				addDoc.add(doc);
+		for(Token tokey: reversedIndex.keySet()) {
+
+			if(tokey.equals(token)) {
+
+				if(!reversedIndex.get(tokey).contains(doc)) {
+					addDoc.add(doc);
+					return addDoc;
+
+				}
+				else if (reversedIndex.get(token).contains(doc)){
+					return addDoc;
+				}
+				
 			}
+
 		}
 		addDoc.add(doc);
 		return addDoc;
@@ -208,6 +214,45 @@ public class Indexer {
 		
 		//TODO - singleQuery
 		
+		
+		Token tokeHold = null;
+		
+		List<Document> listOfDocs = new ArrayList<>();
+		
+		for(Token tokey: reversedIndex.keySet()) {
+			if(tokey.toString().equals(query)) {
+				tokeHold = tokey;
+				
+				break;
+			}
+			
+		}
+		
+		listOfDocs = reversedIndex.get(tokeHold);
+		
+		
+		
+		
+		System.out.println(query);
+		
+		System.out.println("\tDocument name(s)");
+		
+		for(Document doc: listOfDocs) {
+			System.out.println(doc.getName());
+		
+		}
+		for(Document doc: listOfDocs) {
+			System.out.println(doc.getName());
+			for(Integer position: tokeHold.getPositions(doc)) {
+				System.out.println(position);
+				
+			}
+		}
+		
+
+		
+	
+	
 	}
 	
 	/**
