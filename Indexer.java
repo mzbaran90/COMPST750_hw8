@@ -113,10 +113,10 @@ public class Indexer {
 		//TODO - removePunctuation
 		
 		String noPunc = str.replaceAll("\\p{Punct}", "");
-		noPunc = noPunc.toLowerCase();
+		String noPuncLower = noPunc.toLowerCase();
 		
 		
-		return noPunc;
+		return noPuncLower;
 		
 	}
 	

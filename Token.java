@@ -29,7 +29,7 @@ public class Token {
 		int index = 0;
 		
 		while (index != -1) {  // indexOf returns -1 if no match found
-		    String contents = Indexer.allDocs.get(doc.getName());
+		    String contents = Indexer.allDocs.
 		    //index = text.indexOf(match, index + matchLength);
 		}
 		
@@ -65,6 +65,19 @@ public class Token {
 		//TODO - equals method
 		//equals only checks if the passed in Object is a Token and the String variables match.
 		
+		if(o == null) {
+			return false;
+		}
+		
+		if(this == o) {
+			return true;
+		}
+		if( o instanceof Token) {
+			Token temp = (Token)o;
+			return this.token.equals(temp.token);
+		}
+		
+		return false;
 	}
 
 }
