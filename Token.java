@@ -1,13 +1,17 @@
-//TODO
-//Import all necessary libraries.
+import java.util.List;
+import java.util.Map;
 
 public class Token {
-
+	
+	String token;
+	Map <Document, List<Integer>> positionalIndex;
 	
 	public Token(String str) {
 		//TODO
-		//Declare all instance variables
-		//Set the variables.
+		this.token = str;
+		
+	
+		
 	}
 	
 	/**
@@ -19,7 +23,15 @@ public class Token {
 	 */
 	public List<Integer> getPositions(Document doc){
 		
-		//TODO - getPositions
+		List<Integer> tokeyPositions;
+		String tokey = this.token;
+		int tokeyLength = tokey.length();
+		int index = 0;
+		
+		while (index != -1) {  // indexOf returns -1 if no match found
+		    String contents = Indexer.allDocs.get(doc.getName());
+		    //index = text.indexOf(match, index + matchLength);
+		}
 		
 	}
 

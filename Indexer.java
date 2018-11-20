@@ -1,5 +1,9 @@
-//TODO
-//Import all necessary libraries.
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Indexer {
 
@@ -16,11 +20,17 @@ public class Indexer {
 	 * 								-Should increment with each new document created
 	 * 								-First document added will always get ID of 1
 	 */
+	Map <Token, List<Document>> reversedIndex;
+	Map <String, Token> allTokens;
+	static Map <String,Document> allDocs;
+	List<String> allDocsSorted;
+	int assignID= 0;
 
 	public Indexer() {
 		//TODO
 		//Declare all instance variables
 		//What should each variable be initialized to?
+		this.assignID += 1;
 	}
 	
 	
@@ -42,9 +52,50 @@ public class Indexer {
 	 * @param docString
 	 */
 	public void indexDocument(String docString) {
+		String name = getName(docString);
+		if(allDocs.containsKey(name) && name == null) {
+			return;
 
-		//TODO - indexDocument
+		}
+		Document createDoc = new Document(this.assignID,name);
 
+		allDocs.put(name, createDoc);
+
+		String docContents = docString.substring(name.length() +1);
+
+		List<String> seperateTokens = new ArrayList<String>(Arrays.asList(docContents.split(" ")));
+
+		for (String token: seperateTokens) {
+			String formattedString = removePunctuation(token);
+
+			Token createToken = checkToken(formattedString);
+
+			if(createToken != null) {
+
+				List<Document> mapToDoc = checkToken_Document(createToken, createDoc);
+				
+				reversedIndex.put(createToken, mapToDoc);
+				
+
+
+			}
+		}
+	}
+
+	
+	// helper method to get name
+	private String getName(String docString) {
+		
+		String name = null;
+		
+		Pattern nameWrap = Pattern.compile("<(.*?)>");
+		
+		Matcher m = nameWrap.matcher(docString);
+		while (m.find()) {
+		    name = m.group(0);
+		    return name;
+		}
+		return name;
 	}
 
 	
@@ -56,9 +107,16 @@ public class Indexer {
 	 * @param str
 	 * @return a formatted String
 	 */
+	
 	protected String removePunctuation(String str) {
 		
 		//TODO - removePunctuation
+		
+		String noPunc = str.replaceAll("\\p{Punct}", "");
+		noPunc = noPunc.toLowerCase();
+		
+		
+		return noPunc;
 		
 	}
 	
@@ -72,8 +130,12 @@ public class Indexer {
 	 * @return Token
 	 */
 	protected Token checkToken(String str) {
-
-		//TODO - checkToken
+		
+		Token temp = new Token(str);
+		if(allTokens.containsValue(temp)) {
+			temp = null;
+		}
+		return temp;
 		
 	}
 	
@@ -91,9 +153,18 @@ public class Indexer {
 	 * @return a List of Documents with the passed in Document possibly added to the List.
 	 */
 	protected List<Document> checkToken_Document(Token token, Document doc){
-		
-		//TODO - checkToken
-		
+
+		List<Document> addDoc = new ArrayList<>();
+
+		if(reversedIndex.containsKey(token)) {
+			if(reversedIndex.get(token).contains(doc)) {
+				addDoc = reversedIndex.get(token);
+				addDoc.add(doc);
+			}
+		}
+		addDoc.add(doc);
+		return addDoc;
+
 	}
 	
 	
