@@ -271,39 +271,33 @@ public class Indexer {
 		//System.out.println("Two word queries method not implemented yet.");
 		
 		String combineQuery = query[0] +  " " + query[1];
-		System.out.println(combineQuery);
-		
-		
-		
-//		int index = 0;
-//		int posiStart;
+
+
 		for(String docStr: allDocs.keySet()) {
 			String docStrNoPunc = removePunctuation(docStr.toLowerCase());
-			
+
 			if(docStrNoPunc.indexOf(combineQuery.toLowerCase()) != -1) {
-				List <Integer> resultPositions = new ArrayList<>();
 				List <String> splitDoc = new LinkedList<> (Arrays.asList(docStrNoPunc.toLowerCase().split(" ")));
-				//index = docStr.indexOf(combineQuery);
+
 				for(int i = 0; i <  splitDoc.size() -1 ; i ++) {
 					String twoWordToken = splitDoc.get(i) +  " " + splitDoc.get(i+1);
-					
-					
+
 					if(twoWordToken.toLowerCase().equals(combineQuery)) {
 						//resultPositions.add(i+1);
-						
+
 						System.out.println(String.format("Two word query \"%s\" found at location [%s]in document [%s]",combineQuery, i+1, allDocs.get(docStr)));
-						
+
 					}
 				}
-				
-				
-				
+
+
+
 			}
 		}
-		
-		
-		
-		
+
+
+
+
 	}
 		
 	/**
