@@ -63,14 +63,13 @@ public class Indexer {
 		String name = getName(docString);
 		
 
-		Document createDoc = new Document(this.assignID,name);
-		
-
 		if(allDocs.containsKey(docString)) {
 
 			return;
 
 		}
+		
+		Document createDoc = new Document(this.assignID,name);
 		
 		assignID++;
 
@@ -82,32 +81,33 @@ public class Indexer {
 
 		List<String> seperateTokens = new ArrayList<String>(Arrays.asList(docContents.split(" ")));
 
+		int index = 1;
 		for(String token: seperateTokens) {
-			int positionIndex = 0;
-			int index = 0;
+			
+			
 			
 			String formattedString = removePunctuation(token);
 			
 
 			Token createToken = checkToken(formattedString);
 			
+			createToken.setPositions(createDoc, index);
+			
 			List<Document> mapToDoc = checkToken_Document(createToken, createDoc);
-			
-			//if(!mapToDoc.contains(createToken)) {
-				
+	
 			reversedIndex.put(createToken, mapToDoc);
+			
+			index +=1;
 				
 			
-			
-			
-			
-			while(positionIndex!= -1) {
-				positionIndex = docString.toLowerCase().indexOf(formattedString, index);
-				createToken.setPositions(createDoc, positionIndex);
-			
-				index = positionIndex + token.length();
-			
-		}
+			// update posi index by char posi here. Set positions checks to make sure passed position it not -1 
+//			while(positionIndex!= -1) {
+//				positionIndex = docString.toLowerCase().indexOf(formattedString, index);
+//				createToken.setPositions(createDoc, positionIndex);
+//			
+//				index = positionIndex + token.length();
+//			
+//		}
 		
 
 		}
@@ -143,11 +143,7 @@ public class Indexer {
 		
 		//TODO - removePunctuation
 		
-		String noPunc = str.replaceAll("\\p{Punct}", "");
-		String noPuncLower = noPunc.toLowerCase();
-		
-		
-		return noPuncLower;
+		return str.replaceAll("[\\,\\.\\!\\?]", "").toLowerCase().trim();
 		
 	}
 	
@@ -228,40 +224,35 @@ public class Indexer {
 		//TODO - singleQuery
 
 
-		Token tokeHold = null;
+		Token tokenHolder = null;
 
 		List<Document> listOfDocs = new ArrayList<>();
-
-		for(Token tokey: reversedIndex.keySet()) {
-			if(tokey.toString().equals(query.toLowerCase())) {
-				tokeHold = tokey;
-
-				break;
-			}
-
+		
+		
+		if(allTokens.get(query) == null) {
+			System.out.println(String.format("No results for %s", query));
+			return;
+			
 		}
-
-		listOfDocs = reversedIndex.get(tokeHold);
-
-
-
+		tokenHolder = allTokens.get(query);
+		
+		listOfDocs = reversedIndex.get(tokenHolder);
 
 
 
-		System.out.println("\tDocument name(s)");
 
+
+
+		System.out.println(String.format("Documents contatining: \"%s\" : %s", tokenHolder, listOfDocs.toString()));
+
+		
+
+		
 		for(Document doc: listOfDocs) {
-			System.out.println(doc.getName());
-			System.out.println();
-
-		}
-		for(Document doc: listOfDocs) {
-			System.out.println(doc.getName());
-			List<Integer>listOfPos = tokeHold.getPositions(doc);
+			
+			List<Integer>listOfPos = tokenHolder.getPositions(doc);
 			if(listOfPos != null) {
-				for(Integer position: listOfPos) {
-					System.out.println(position);
-
+				System.out.println(String.format("DocID: %s , DocPositions = %s", doc.toString(),tokenHolder.getPositions(doc).toString()));
 				}
 			}
 
@@ -271,7 +262,7 @@ public class Indexer {
 
 
 
-	}
+	
 
 	/**
 	 * Graduate students must complete.

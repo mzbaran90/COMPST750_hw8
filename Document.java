@@ -21,7 +21,7 @@ public class Document {
 	}
 	
 	public String toString() {
-		return "DocID: " + Integer.toString(this.docID);
+		return Integer.toString(this.docID);
 		
 	}
 	
