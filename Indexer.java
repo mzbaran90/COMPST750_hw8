@@ -2,6 +2,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -230,7 +231,7 @@ public class Indexer {
 		
 		
 		if(allTokens.get(query) == null) {
-			System.out.println(String.format("No results for %s", query));
+			System.out.println(String.format("No results for \"%s\"", query));
 			return;
 			
 		}
@@ -239,22 +240,13 @@ public class Indexer {
 		listOfDocs = reversedIndex.get(tokenHolder);
 
 
-
-
-
-
 		System.out.println(String.format("Documents contatining: \"%s\" : %s", tokenHolder, listOfDocs.toString()));
 
-		
-
-		
 		for(Document doc: listOfDocs) {
 			
-			List<Integer>listOfPos = tokenHolder.getPositions(doc);
-			if(listOfPos != null) {
-				System.out.println(String.format("DocID: %s , DocPositions = %s", doc.toString(),tokenHolder.getPositions(doc).toString()));
+			System.out.println(String.format("DocID: %s , DocPositions = %s", doc.toString(),tokenHolder.getPositions(doc).toString()));
 				}
-			}
+			
 
 		}
 
@@ -276,7 +268,40 @@ public class Indexer {
 		
 		//TODO - twoWordQuery
 		//Remove the print statement when you try to complete this method.
-		System.out.println("Two word queries method not implemented yet.");
+		//System.out.println("Two word queries method not implemented yet.");
+		
+		String combineQuery = query[0] +  " " + query[1];
+		System.out.println(combineQuery);
+		
+		
+		
+//		int index = 0;
+//		int posiStart;
+		for(String docStr: allDocs.keySet()) {
+			String docStrNoPunc = removePunctuation(docStr.toLowerCase());
+			
+			if(docStrNoPunc.indexOf(combineQuery.toLowerCase()) != -1) {
+				List <Integer> resultPositions = new ArrayList<>();
+				List <String> splitDoc = new LinkedList<> (Arrays.asList(docStrNoPunc.toLowerCase().split(" ")));
+				//index = docStr.indexOf(combineQuery);
+				for(int i = 0; i <  splitDoc.size() -1 ; i ++) {
+					String twoWordToken = splitDoc.get(i) +  " " + splitDoc.get(i+1);
+					
+					
+					if(twoWordToken.toLowerCase().equals(combineQuery)) {
+						//resultPositions.add(i+1);
+						
+						System.out.println(String.format("Two word query \"%s\" found at location [%s]in document [%s]",combineQuery, i+1, allDocs.get(docStr)));
+						
+					}
+				}
+				
+				
+				
+			}
+		}
+		
+		
 		
 		
 	}
