@@ -266,35 +266,37 @@ public class Indexer {
 	 */
 	public void twoWordQuery(String[] query) {
 		
-		//TODO - twoWordQuery
-		//Remove the print statement when you try to complete this method.
-		//System.out.println("Two word queries method not implemented yet.");
 		
 		String combineQuery = query[0] +  " " + query[1];
+		String combineQueryLower = combineQuery.toLowerCase();
+		boolean resultSuccess = false;
 
 
 		for(String docStr: allDocs.keySet()) {
-			String docStrNoPunc = removePunctuation(docStr.toLowerCase());
+			String docStrNoPuncLower = removePunctuation(docStr.toLowerCase());
 
-			if(docStrNoPunc.indexOf(combineQuery.toLowerCase()) != -1) {
-				List <String> splitDoc = new LinkedList<> (Arrays.asList(docStrNoPunc.toLowerCase().split(" ")));
+			if(docStrNoPuncLower.indexOf(combineQueryLower) != -1) {
+				List <String> splitDoc = new LinkedList<> (Arrays.asList(docStrNoPuncLower.toLowerCase().split(" ")));
+				resultSuccess = true;
 
 				for(int i = 0; i <  splitDoc.size() -1 ; i ++) {
 					String twoWordToken = splitDoc.get(i) +  " " + splitDoc.get(i+1);
 
-					if(twoWordToken.toLowerCase().equals(combineQuery)) {
-						//resultPositions.add(i+1);
-
-						System.out.println(String.format("Two word query \"%s\" found at location [%s]in document [%s]",combineQuery, i+1, allDocs.get(docStr)));
+					if(twoWordToken.toLowerCase().equals(combineQueryLower)) {
+		
+						System.out.println(String.format("Two word query \"%s\" found at location [%s] in document [%s]",combineQueryLower, i+1, allDocs.get(docStr)));
 
 					}
+					
 				}
 
-
+		
 
 			}
 		}
-
+		if(!resultSuccess) {
+			System.out.println("No results found, try again");
+		}
 
 
 
