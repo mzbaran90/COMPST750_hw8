@@ -62,9 +62,10 @@ public class Indexer {
 	 */
 	public void indexDocument(String docString) {
 		String name = getName(docString);
+		System.out.println(name.length());
 		
 
-		if(allDocs.containsKey(docString)) {
+		if(allDocs.containsKey(name)) {
 
 			return;
 
@@ -73,31 +74,28 @@ public class Indexer {
 		Document createDoc = new Document(this.assignID,name);
 		
 		assignID++;
-
-		allDocs.put(docString, createDoc);
+		
+		allDocs.put(name, createDoc);
  
 		allDocsSorted.add(createDoc);
 
-		String docContents = docString.substring(name.length());
+		String docContents = docString.substring(name.length()+2);
+		System.out.println(docContents);
 
 		List<String> seperateTokens = new ArrayList<String>(Arrays.asList(docContents.split(" ")));
 
 		int index = 1;
 		for(String token: seperateTokens) {
 			
+		
+			String formattedString = removePunctuation(token).trim();
 			
-			
-			String formattedString = removePunctuation(token);
-			
-
 			Token createToken = checkToken(formattedString);
 			
 			createToken.setPositions(createDoc, index);
 			
-			List<Document> mapToDoc = checkToken_Document(createToken, createDoc);
-	
-			reversedIndex.put(createToken, mapToDoc);
-			
+			checkToken_Document(createToken, createDoc);
+		
 			index +=1;
 				
 			
@@ -124,7 +122,7 @@ public class Indexer {
 		
 		Matcher m = nameWrap.matcher(docString);
 		while (m.find()) {
-		    name = m.group(0);
+		    name = m.group(1);
 		    return name;
 		}
 		return name;
@@ -167,6 +165,7 @@ public class Indexer {
 		allTokens.put(str, temp);
 		return temp;
 		
+
 	}
 	
 	/**
@@ -184,30 +183,25 @@ public class Indexer {
 	 */
 	protected List<Document> checkToken_Document(Token token, Document doc){
 
-		List<Document> addDoc = new ArrayList<>();
-
-		for(Token tokey: reversedIndex.keySet()) {
-
-			if(tokey.equals(token)) {
-				addDoc = reversedIndex.get(tokey);
-				
-				if(!addDoc.contains(doc)) {
-					addDoc.add(doc);
-					return addDoc;
-
-				}
-				else if (addDoc.contains(doc)){
-					return addDoc;
-				}
-				
-			}
-
-		}
-		addDoc.add(doc);
-		return addDoc;
-
-	}
+		List <Document> addDoc = new ArrayList<>();
+		if(reversedIndex.get(token) == null) {
+			addDoc.add(doc);
+			reversedIndex.put(token,addDoc);
 	
+		}
+		else if(!reversedIndex.get(token).contains(doc) ) {
+			addDoc = reversedIndex.get(token);
+			addDoc.add(doc);
+			reversedIndex.put(token, addDoc);
+		
+			
+		}
+		
+		return reversedIndex.get(token);
+	
+
+		
+	}
 	
 	/**
 	 * Use the reversedIndex to answer the query and print out the list of documents that contain the term.
@@ -266,37 +260,58 @@ public class Indexer {
 	 */
 	public void twoWordQuery(String[] query) {
 		
-		
-		String combineQuery = query[0] +  " " + query[1];
-		String combineQueryLower = combineQuery.toLowerCase();
-		boolean resultSuccess = false;
+		String formattedToken1 = removePunctuation(query[0]);
+		String formattedToken2 = removePunctuation(query[1]);
 
+		if(!(allTokens.containsKey(formattedToken1) && allTokens.containsKey(formattedToken2))) {
+			System.out.println(String.format("No results were found for %s %s", query[0], query[1]));
+			return;
+		}
 
-		for(String docStr: allDocs.keySet()) {
-			String docStrNoPuncLower = removePunctuation(docStr.toLowerCase());
+		Token token1 = allTokens.get(formattedToken1);
+		Token token2 = allTokens.get(formattedToken2);
 
-			if(docStrNoPuncLower.indexOf(combineQueryLower) != -1) {
-				List <String> splitDoc = new LinkedList<> (Arrays.asList(docStrNoPuncLower.toLowerCase().split(" ")));
-				resultSuccess = true;
+		List<Document> occurencesToken1 = reversedIndex.get(token1);
+		List<Document> occurencesToken2 = reversedIndex.get(token2);
 
-				for(int i = 0; i <  splitDoc.size() -1 ; i ++) {
-					String twoWordToken = splitDoc.get(i) +  " " + splitDoc.get(i+1);
+		//Intersection method returns List of shared document between occuranceToken#
+		List<Document> sharedDocs = intersection(occurencesToken1, occurencesToken2);
 
-					if(twoWordToken.toLowerCase().equals(combineQueryLower)) {
-		
-						System.out.println(String.format("Two word query \"%s\" found at location [%s] in document [%s]",combineQueryLower, i+1, allDocs.get(docStr)));
+		//init map of docs(docID) and positions --> doc: posPairs
 
-					}
-					
-				}
+		HashMap <Integer, List<Integer>> docPositions = new HashMap<>();
 
-		
+		//iterate through sharedDocs -> cartesian method returns positions of each occurence 
 
+		for(Document doc: sharedDocs) {
+			
+			//temp list to store position pairs - empty lists are not appened to docPositions
+			List<Integer> positionPairs = check_positionPairs(token1, token2, doc);
+			
+			if(positionPairs.size() != 0) {
+				docPositions.put(doc.getID(), positionPairs);
+				
 			}
+			
 		}
-		if(!resultSuccess) {
-			System.out.println("No results found, try again");
-		}
+			
+			
+		System.out.println(String.format("Documents containing \"%s %s\" \n %s", query[0], query[1], docPositions.keySet().toString()));
+		System.out.println();
+		
+			//System.out.println(String.format("positions: %s ", ));
+			for(Integer docID: docPositions.keySet()) {
+				
+				for(Integer pos: docPositions.get(docID)) {
+					System.out.println(String.format("Two word query found at position %s in document %s",pos, docID));
+				}
+				
+			}
+		
+
+
+		
+
 
 
 
@@ -306,7 +321,49 @@ public class Indexer {
 	 * A simple method that prints out all Documents that have been seen.
 	 * Use the list containing allDocsSorted to print them out.
 	 * 
+	 * 
 	 */
+	
+	
+	private List<Document> intersection(List<Document> docs1, List<Document> docs2) {
+		
+		List <Document> sharedDocs = new ArrayList<>();
+		
+		for(Document doc1: docs1) {
+			if(docs2.contains(doc1)) {
+				sharedDocs.add(doc1);
+			}
+			
+				
+		}
+		return sharedDocs;
+		
+		
+	}
+	
+	private List<Integer> check_positionPairs(Token token1, Token token2, Document doc){
+		
+		List<Integer> positionPairs = new ArrayList<>();
+		List<Integer> posToken1 = token1.getPositions(doc);
+		List<Integer> posToken2 = token2.getPositions(doc);
+		
+		if(posToken1.size() < 0 || posToken2.size() < 0) {
+			
+			return positionPairs;
+			
+		}
+		
+		for(Integer pos1: posToken1) {
+			if(posToken2.contains(pos1 + 1)) {
+				//Integer pos2 = posToken2.get(pos1 + 1);
+				positionPairs.add(pos1);
+			}	
+		}
+		return positionPairs;
+		
+		
+		
+	}
 	public void printOutAllDocs() {
 		
 		//TODO - printOutAllDocs

@@ -6,11 +6,14 @@ import java.util.Map;
 public class Token {
 	
 	private String token;
-	private Map <Document, List<Integer>> positionalIndex = new HashMap<>();
+	private Map <Document, List<Integer>> positionalIndex;
 	
 	public Token(String str) {
 		//TODO
 		this.token = str;
+		positionalIndex= new HashMap<>();
+		
+		
 		
 
 	}
